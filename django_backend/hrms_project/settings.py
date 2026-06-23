@@ -37,7 +37,6 @@ MIDDLEWARE = [
 ROOT_URLCONF = "hrms_project.urls"
 WSGI_APPLICATION = "hrms_project.wsgi.application"
 ASGI_APPLICATION = "hrms_project.asgi.application"
-AUTH_USER_MODEL = "hrms.User"
 
 TEMPLATES = [
     {
