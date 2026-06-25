@@ -92,23 +92,21 @@ MEDIA_URL = "media/"
 MEDIA_ROOT = BASE_DIR / "media"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-# Database Configuration for Render (PostgreSQL)
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.postgresql",
-        "NAME": config("DB_NAME", default="attend_ai"),
-        "USER": config("DB_USER", default="postgres"),
-        "PASSWORD": config("DB_PASSWORD", default=""),
-        "HOST": config("DB_HOST", default="localhost"),
-        "PORT": config("DB_PORT", default="5432"),
-    }
-}
-
-# Render PostgreSQL URL parsing
-import dj_database_url
+# Database Configuration
+# Use SQLite for local development, PostgreSQL for production
 if config("DATABASE_URL", default=""):
-    DATABASES["default"] = dj_database_url.parse(config("DATABASE_URL"))
+    import dj_database_url
+    DATABASES = {
+        "default": dj_database_url.parse(config("DATABASE_URL"))
+    }
     DATABASES["default"]["CONN_MAX_AGE"] = 600
+else:
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": BASE_DIR / "db.sqlite3",
+        }
+    }
 
 CELERY_BROKER_URL = config("REDIS_URL", default="redis://localhost:6379/0")
 CELERY_RESULT_BACKEND = CELERY_BROKER_URL
