@@ -9,6 +9,13 @@ SECRET_KEY = config("SECRET_KEY", default=get_random_secret_key())
 DEBUG = config("DEBUG", default=False, cast=bool)
 ALLOWED_HOSTS = config("ALLOWED_HOSTS", default="*", cast=Csv())
 
+# Add CSRF_TRUSTED_ORIGINS for production
+CSRF_TRUSTED_ORIGINS = config(
+    "CSRF_TRUSTED_ORIGINS",
+    default="http://localhost,http://127.0.0.1",
+    cast=Csv(),
+)
+
 INSTALLED_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",
@@ -97,9 +104,8 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 if config("DATABASE_URL", default=""):
     import dj_database_url
     DATABASES = {
-        "default": dj_database_url.parse(config("DATABASE_URL"))
+        "default": dj_database_url.parse(config("DATABASE_URL"), conn_max_age=600)
     }
-    DATABASES["default"]["CONN_MAX_AGE"] = 600
 else:
     DATABASES = {
         "default": {
