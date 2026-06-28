@@ -83,7 +83,7 @@ SPECTACULAR_SETTINGS = {
 
 CORS_ALLOWED_ORIGINS = config(
     "CORS_ALLOWED_ORIGINS",
-    default="",
+    default="http://localhost:3000,http://127.0.0.1:3000",
     cast=Csv(),
 )
 
@@ -101,11 +101,13 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # Database Configuration
 # Use SQLite for local development, PostgreSQL for production
-if config("DATABASE_URL", default=""):
+database_url = config("DATABASE_URL", default="")
+if database_url:
     import dj_database_url
     DATABASES = {
-        "default": dj_database_url.parse(config("DATABASE_URL"), conn_max_age=600)
+        "default": dj_database_url.parse(database_url)
     }
+    DATABASES["default"]["CONN_MAX_AGE"] = 600
 else:
     DATABASES = {
         "default": {

@@ -1,1 +1,5 @@
+<<<<<<< HEAD
 web: gunicorn hrms_project.wsgi:application --workers 3 --bind 0.0.0.0:$PORT --timeout 120
+=======
+web: gunicorn hrms_project.wsgi:application --workers 3 --bind 0.0.0.0:$PORT
+>>>>>>> 38eaefb (Production ready: Django backend configured for Render deployment, frontend deployed to Vercel)

@@ -19,5 +19,8 @@ pytest>=8.0
 pytest-django>=4.8
 dj-database-url>=2.0
 gunicorn>=21.0
+<<<<<<< HEAD
 waitress>=2.1
+=======
+>>>>>>> 38eaefb (Production ready: Django backend configured for Render deployment, frontend deployed to Vercel)
 whitenoise>=6.0

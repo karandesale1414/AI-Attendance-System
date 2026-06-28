@@ -43,6 +43,13 @@ class LoginAPIView(APIView):
         user = authenticate(username=username, password=password)
         if not user:
             return Response({"message": "Invalid credentials"}, status=status.HTTP_401_UNAUTHORIZED)
+<<<<<<< HEAD
+=======
+        
+        if user.is_superuser and user.role != User.Role.ADMIN:
+            user.role = User.Role.ADMIN
+            user.save(update_fields=["role"])
+>>>>>>> 38eaefb (Production ready: Django backend configured for Render deployment, frontend deployed to Vercel)
 
         refresh = RefreshToken.for_user(user)
         return Response({
@@ -53,7 +60,11 @@ class LoginAPIView(APIView):
                 "_id": user.id,
                 "name": user.get_full_name() or user.username,
                 "email": user.email,
+<<<<<<< HEAD
                 "role": "ADMIN" if user.is_superuser else "HR",
+=======
+                "role": user.role,
+>>>>>>> 38eaefb (Production ready: Django backend configured for Render deployment, frontend deployed to Vercel)
             },
         })
 
@@ -65,12 +76,22 @@ class RegisterAPIView(APIView):
         name = request.data.get("name", "").strip()
         email = request.data.get("email", "").strip()
         password = request.data.get("password", "")
+<<<<<<< HEAD
+=======
+        role = request.data.get("role", "HR").upper().replace(" ", "_")
+>>>>>>> 38eaefb (Production ready: Django backend configured for Render deployment, frontend deployed to Vercel)
         if not name or not email or not password:
             return Response({"message": "Fill all fields"}, status=status.HTTP_400_BAD_REQUEST)
         if User.objects.filter(username=email).exists() or User.objects.filter(email=email).exists():
             return Response({"message": "Admin already exists"}, status=status.HTTP_400_BAD_REQUEST)
+<<<<<<< HEAD
         user = User.objects.create_user(username=email, email=email, password=password, first_name=name, is_staff=True)
         return Response({"success": True, "admin": {"_id": user.id, "name": name, "email": email, "role": "ADMIN" if user.is_superuser else "HR"}})
+=======
+        mapped_role = User.Role.ADMIN if "ADMIN" in role else User.Role.HR
+        user = User.objects.create_user(username=email, email=email, password=password, first_name=name, role=mapped_role)
+        return Response({"success": True, "admin": {"_id": user.id, "name": name, "email": email, "role": user.role}})
+>>>>>>> 38eaefb (Production ready: Django backend configured for Render deployment, frontend deployed to Vercel)
 
 
 class EmployeeViewSet(viewsets.ModelViewSet):
@@ -173,12 +194,21 @@ class LeaveViewSet(viewsets.ModelViewSet):
         return Response({"success": True, "data": serializer.data})
 
     def get_queryset(self):
+<<<<<<< HEAD
         if self.request.user.is_superuser or self.request.user.is_staff:
+=======
+        if self.request.user.is_superuser or self.request.user.is_staff or self.request.user.role in {"ADMIN", "HR"}:
+>>>>>>> 38eaefb (Production ready: Django backend configured for Render deployment, frontend deployed to Vercel)
             return self.queryset
         return self.queryset.filter(employee__user=self.request.user)
 
     def perform_create(self, serializer):
         employee = serializer.validated_data.get("employee")
+<<<<<<< HEAD
+=======
+        if self.request.user.role == "EMPLOYEE":
+            employee = self.request.user.employee_profile
+>>>>>>> 38eaefb (Production ready: Django backend configured for Render deployment, frontend deployed to Vercel)
         serializer.save(employee=employee)
 
     def create(self, request, *args, **kwargs):
@@ -229,7 +259,11 @@ class SalarySlipViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = SalarySlipSerializer
 
     def get_queryset(self):
+<<<<<<< HEAD
         if self.request.user.is_superuser or self.request.user.is_staff:
+=======
+        if self.request.user.is_superuser or self.request.user.is_staff or self.request.user.role in {"ADMIN", "HR"}:
+>>>>>>> 38eaefb (Production ready: Django backend configured for Render deployment, frontend deployed to Vercel)
             return self.queryset
         return self.queryset.filter(employee__user=self.request.user)
 
