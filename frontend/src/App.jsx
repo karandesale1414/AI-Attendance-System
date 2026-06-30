@@ -77,6 +77,7 @@ function App() {
   const [admin, setAdmin] = useState(null);
   const [authMode, setAuthMode] = useState("login");
   const [activePage, setActivePage] = useState("dashboard");
+  const [isInitialLoad, setIsInitialLoad] = useState(true);
   const [loginForm, setLoginForm] = useState({ email: "admin", password: "admin1234" });
   const [registerForm, setRegisterForm] = useState({
     name: "",
@@ -216,10 +217,10 @@ function App() {
     const res = await fetch(url, { ...options, headers });
     const data = await res.json();
     if (!res.ok) {
-      if (res.status === 401) {
-        clearSession();
-        throw new Error("Session expired. Please login again.");
-      }
+if (res.status === 401) {
+  console.log("401 API ERROR:", url);
+  throw new Error("Unauthorized API request");
+}
       const detail =
         data.message ||
         data.detail ||
@@ -265,8 +266,10 @@ function App() {
         fetchLeaves(),
         fetchMonthlyReport(),
       ]);
+      setIsInitialLoad(false);
     } catch (error) {
       console.log("Refresh error:", error);
+      setIsInitialLoad(false);
       showToast(error.message || "Unable to refresh application data", "error");
     }
   };
@@ -310,18 +313,39 @@ function App() {
   );
 
   const handleLogin = async () => {
-    // Auto-login for smooth access
     try {
-      setAdmin({
-        _id: 1,
-        name: "Admin",
-        email: "admin@company.com",
-        role: "ADMIN",
+      const response = await fetch(`${API}/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          username: loginForm.email,
+          password: loginForm.password,
+        }),
       });
+      
+      const data = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(data.message || data.detail || "Login failed");
+      }
+      
+      const accessToken = data.access || data.accessToken || data.token;
+      const adminData = data.user || data.admin || {
+        _id: data.id || data.user_id,
+        name: data.name || data.username,
+        email: data.email || loginForm.email,
+        role: data.role || "ADMIN",
+      };
+      
+      localStorage.setItem("accessToken", accessToken);
+      localStorage.setItem("admin", JSON.stringify(adminData));
+      
+      setAdmin(adminData);
       setIsLoggedIn(true);
+      setIsInitialLoad(true);
       showToast("Welcome back. Your workspace is ready.");
     } catch (error) {
-      showToast("Login failed. Please try again.", "error");
+      showToast(error.message || "Login failed. Please try again.", "error");
     }
   };
 
