@@ -324,6 +324,7 @@ if (res.status === 401) {
       });
       
       const data = await response.json();
+      console.log("LOGIN RESPONSE:", data);
       
       if (!response.ok) {
         throw new Error(data.message || data.detail || "Login failed");
