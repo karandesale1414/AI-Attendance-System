@@ -1,0 +1,23 @@
+﻿.venv/
+venv/
+__pycache__/
+*.pyc
+node_modules/
+dist/
+.env
+.env.*
+!.env.example
+*.log
+
+facenet_keras.h5
+
+# Local data and AI models
+python_scripts_disabled/attendance.db
+python_scripts_disabled/students.xlsx
+python_scripts_disabled/students.xlsx
+
+# Old disabled frontend/backend projects
+frontend/backend/
+frontend/client/
+python_scripts_disabled/trainer.yml
+python_scripts_disabled/trainer.yml
